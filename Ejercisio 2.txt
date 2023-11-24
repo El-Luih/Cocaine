@@ -1,0 +1,67 @@
+import java.util.Random;
+import java.util.Scanner;
+
+public class PuntosDeSilla {
+    private static Scanner scanner = new Scanner(System.in);
+    private static Random random = new Random();
+
+    public static void main(String[] args) {
+        System.out.println("Ingrese el número de filas:");
+        int filas = scanner.nextInt();
+        System.out.println("Ingrese el número de columnas:");
+        int columnas = scanner.nextInt();
+
+        int[][] matriz = generarIntMatrizAleatoria(filas, columnas);
+        imprimirMatriz(matriz);
+        encontrarPuntosSilla(matriz);
+    }
+
+    private static int[][] generarIntMatrizAleatoria(int filas, int columnas) {
+        int[][] matriz = new int[filas][columnas];
+        for (int i = 0; i < filas; i++) {
+            for (int j = 0; j < columnas; j++) {
+                matriz[i][j] = random.nextInt(100); // Números entre 0 y 99
+            }
+        }
+        return matriz;
+    }
+
+    private static void imprimirMatriz(int[][] matriz) {
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                System.out.print(matriz[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+
+    private static void encontrarPuntosSilla(int[][] matriz) {
+        boolean puntoSillaEncontrado = false;
+        for (int i = 0; i < matriz.length; i++) {
+            for (int j = 0; j < matriz[i].length; j++) {
+                if (esPuntoSilla(matriz, i, j)) {
+                    System.out.println("Punto de silla encontrado en (" + i + ", " + j + ") con valor " + matriz[i][j]);
+                    puntoSillaEncontrado = true;
+                }
+            }
+        }
+        if (!puntoSillaEncontrado) {
+            System.out.println("No se encontraron puntos de silla en la matriz.");
+        }
+    }
+
+    private static boolean esPuntoSilla(int[][] matriz, int fila, int columna) {
+        int valor = matriz[fila][columna];
+        for (int i = 0; i < matriz.length; i++) {
+            if (matriz[i][columna] > valor) {
+                return false;
+            }
+        }
+        for (int j = 0; j < matriz[fila].length; j++) {
+            if (matriz[fila][j] < valor) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
