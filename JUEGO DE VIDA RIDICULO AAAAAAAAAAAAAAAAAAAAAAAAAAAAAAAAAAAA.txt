@@ -1,0 +1,113 @@
+import java.util.ArrayList;
+import java.util.Scanner;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Ingrese el número de rondas: ");
+        int rondas = scanner.nextInt();
+
+        Game game = new Game();
+        game.setTableroActual(inicializarTablero());
+        game.jugar(rondas);
+
+        scanner.close();
+    }
+
+    public static int[][] inicializarTablero() {
+        int[][] tablero = new int[10][10];
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                tablero[i][j] = Math.random() < 0.5 ? 0 : 1;
+            }
+        }
+        return tablero;
+    }
+}
+
+class Game {
+    private int[][] tableroActual;
+    private int[][] tableroSiguiente;
+    private ArrayList<String> coordenadasVivas;
+
+    public Game() {
+        this.tableroActual = new int[10][10];
+        this.tableroSiguiente = new int[10][10];
+        this.coordenadasVivas = new ArrayList<>();
+    }
+
+    public void setTableroActual(int[][] tablero) {
+        this.tableroActual = tablero;
+        actualizarCoordenadasVivas();
+    }
+
+    private void actualizarCoordenadasVivas() {
+        coordenadasVivas.clear();
+        for (int i = 0; i < tableroActual.length; i++) {
+            for (int j = 0; j < tableroActual[i].length; j++) {
+                if (tableroActual[i][j] == 1) {
+                    coordenadasVivas.add(i + ":" + j);
+                }
+            }
+        }
+    }
+
+    public void jugar(int rondas) {
+        for (int i = 0; i < rondas; i++) {
+            System.out.println("Ronda " + (i + 1) + ":");
+            Print(coordenadasVivas);
+            System.out.println("Coordenadas vivas: " + coordenadasVivas);
+            System.out.println("-----------------------------------------");
+            nextGen();
+            // Swap entre tableroActual y tableroSiguiente
+            int[][] temp = tableroActual;
+            tableroActual = tableroSiguiente;
+            tableroSiguiente = temp;
+            actualizarCoordenadasVivas();
+        }
+    }
+
+    public void nextGen() {
+        for (int i = 0; i < tableroActual.length; i++) {
+            for (int j = 0; j < tableroActual[i].length; j++) {
+                int vecinosVivos = contarVecinosVivos(i, j);
+                if (tableroActual[i][j] == 1 && (vecinosVivos == 2 || vecinosVivos == 3)) {
+                    tableroSiguiente[i][j] = 1;
+                } else if (tableroActual[i][j] == 0 && vecinosVivos == 3) {
+                    tableroSiguiente[i][j] = 1;
+                } else {
+                    tableroSiguiente[i][j] = 0;
+                }
+            }
+        }
+    }
+
+    private int contarVecinosVivos(int x, int y) {
+        int vivos = 0;
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                if (x + i < 0 || x + i >= tableroActual.length || y + j < 0 || y + j >= tableroActual[x + i].length || (i == 0 && j == 0)) {
+                    continue;
+                }
+                vivos += tableroActual[x + i][y + j];
+            }
+        }
+        return vivos;
+    }
+
+    public void Print(ArrayList<String> coordenadas) {
+        int[][] tableroTemporal = new int[10][10];
+        for (String coord : coordenadas) {
+            String[] parts = coord.split(":");
+            int x = Integer.parseInt(parts[0]);
+            int y = Integer.parseInt(parts[1]);
+            tableroTemporal[x][y] = 1;
+        }
+        for (int i = 0; i < tableroTemporal.length; i++) {
+            for (int j = 0; j < tableroTemporal[i].length; j++) {
+                System.out.print(tableroTemporal[i][j] == 1 ? "X " : ". ");
+            }
+            System.out.println();
+        }
+    }
+}
